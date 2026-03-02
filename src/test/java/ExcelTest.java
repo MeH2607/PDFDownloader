@@ -14,11 +14,11 @@ import java.util.*;
 
 public class ExcelTest {
 
-    ExcelRow er0 = new ExcelRow(1, "https://www.novonordisk.com/content/dam/nncorp/global/en/investors/irmaterial/annual_report/2025/novo-nordisk-annual-report-2024.pdfst","https://www.novonordisk.com/content/dam/nncorp/global/en/investors/irmaterial/annual_report/2025/novo-nordisk-annual-report-2024.pdf", true);
-    ExcelRow er1 = new ExcelRow(2, "https://danskebank.com/-/media/danske-bank-com/file-cloud/2025/2/danske-bank---annual-report-2024.pdf?rev=430be65be4cd43d18fc8adeec2139eb5",null, true);
-    ExcelRow er2 = new ExcelRow(3, "https://www.cbs.dk/files/cbs.dk/call_to_action/cbs-annual-report-2024.pdf", null, true);
-    ExcelRow er3 = new ExcelRow(4, "https://www.nordea.com/en/doc/annual-report-nordea-bank-abp-2024-0.pdf",null, true);
-    ExcelRow er4 = new ExcelRow(5, "https://www.eifo.dk/media/f23eicl4/eifo-annual-report-2026.pdf","https://www.eifo.dk/media/f23eicl4/eifo-annual-report-2024.pdf", true);
+    ExcelRow er0 = new ExcelRow(1, "https://www.novonordisk.com/content/dam/nncorp/global/en/investors/irmaterial/annual_report/2025/novo-nordisk-annual-report-2024.pdfst","https://www.novonordisk.com/content/dam/nncorp/global/en/investors/irmaterial/annual_report/2025/novo-nordisk-annual-report-2024.pdf", false);
+    ExcelRow er1 = new ExcelRow(2, "https://danskebank.com/-/media/danske-bank-com/file-cloud/2025/2/danske-bank---annual-report-2024.pdf?rev=430be65be4cd43d18fc8adeec2139eb5",null, false);
+    ExcelRow er2 = new ExcelRow(3, "https://www.cbs.dk/files/cbs.dk/call_to_action/cbs-annual-report-2024.pdf", null, false);
+    ExcelRow er3 = new ExcelRow(4, "https://www.nordea.com/en/doc/annual-report-nordea-bank-abp-2024-0.pdf",null, false);
+    ExcelRow er4 = new ExcelRow(5, "https://www.eifo.dk/media/f23eicl4/eifo-annual-report-2026.pdf","https://www.eifo.dk/media/f23eicl4/eifo-annual-report-2024.pdf", false);
     ArrayList<ExcelRow> expectedRows = new ArrayList<>(Arrays.asList(er0, er1, er2, er3,er4));
     @Test
     void readFirst5LinesOfFile(){
