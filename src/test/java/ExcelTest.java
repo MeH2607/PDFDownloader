@@ -1,15 +1,18 @@
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.example.entities.DownloadStatus;
 import org.example.entities.ExcelRow;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class ExcelTest {
@@ -92,5 +95,84 @@ public class ExcelTest {
             assertEquals(expectedRow.getBackupLink(), actualRow.getBackupLink(), "BackupLink mismatch at index " + i);
         }
 
+    }
+
+    @Test
+    void writeToExcelFile() throws IOException{
+
+
+
+        DownloadStatus downloadStatus1 = new DownloadStatus("1 - file", "Path/path/report", true);
+        DownloadStatus downloadStatus2 = new DownloadStatus("2 - failed to download", null, false);
+        DownloadStatus downloadStatus3 = new DownloadStatus("3 - file", "Path/path/report", true);
+        DownloadStatus downloadStatus4 = new DownloadStatus("4 - failed to download", null, false);
+        DownloadStatus downloadStatus5 = new DownloadStatus("5 - file", "Path/path/report", true);
+
+        ArrayList<DownloadStatus> downloads = new ArrayList<>(Arrays.asList(downloadStatus1,downloadStatus2,downloadStatus3,downloadStatus4,downloadStatus5));
+
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Persons");
+        sheet.setColumnWidth(0, 6000);
+        sheet.setColumnWidth(1, 4000);
+
+        Row header = sheet.createRow(0);
+
+        CellStyle headerStyle = workbook.createCellStyle();
+        headerStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+        XSSFFont font = ((XSSFWorkbook) workbook).createFont();
+        font.setFontName("Arial");
+        font.setFontHeightInPoints((short) 16);
+        font.setBold(true);
+        headerStyle.setFont(font);
+
+        Cell headerCell = header.createCell(0);
+        headerCell.setCellValue("Filename");
+        headerCell.setCellStyle(headerStyle);
+
+        headerCell = header.createCell(1);
+        headerCell.setCellValue("Filepath");
+        headerCell.setCellStyle(headerStyle);
+
+        headerCell = header.createCell(3);
+        headerCell.setCellValue("Has been downloaded");
+        headerCell.setCellStyle(headerStyle);
+
+        CellStyle style = workbook.createCellStyle();
+        style.setWrapText(true);
+
+        for(int i = 0; i<downloads.size(); i++){
+            Row row = sheet.createRow(i+2); //create row in row 2 and up
+
+            Cell cell = row.createCell(0);
+            cell.setCellValue(downloads.get(i).getFileName());
+            cell.setCellStyle(style);
+
+            cell = row.createCell(1);
+            cell.setCellValue(downloads.get(i).getFilePath());
+            cell.setCellStyle(style);
+
+            cell = row.createCell(2);
+            cell.setCellValue(downloads.get(i).isDownloaded() ? "Download successful":"Download failed");
+            cell.setCellStyle(style);
+        }
+
+        File currDir = new File(".");
+        String path = currDir.getAbsolutePath();
+        String fileLocation = path.substring(0, path.length() - 1) + "writeTest.xlsx";
+
+        // ✅ Delete file if it already exists (for clean test run)
+        Path filePath = Paths.get(fileLocation);
+        Files.deleteIfExists(filePath);
+
+
+        FileOutputStream outputStream = new FileOutputStream(fileLocation);
+        workbook.write(outputStream);
+        workbook.close();
+
+        File file = new File(fileLocation);
+        assertTrue(file.exists());
+        assertTrue(file.length() > 0);
     }
 }
