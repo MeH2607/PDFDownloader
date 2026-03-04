@@ -4,6 +4,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.example.entities.DownloadStatus;
 import org.example.entities.ExcelRow;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
@@ -98,7 +99,7 @@ public class ExcelTest {
     }
 
     @Test
-    void writeToExcelFile() throws IOException{ //TODO fix  formatting
+    void testWriteToExcelFile() throws IOException{ //TODO fix  formatting
 
 
 
@@ -113,18 +114,21 @@ public class ExcelTest {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Persons");
         sheet.setColumnWidth(0, 6000);
-        sheet.setColumnWidth(1, 4000);
+        sheet.setColumnWidth(1, 4500);
+        sheet.setColumnWidth(2, 6200);
 
         Row header = sheet.createRow(0);
 
         CellStyle headerStyle = workbook.createCellStyle();
-        headerStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
+        headerStyle.setFillForegroundColor(IndexedColors.GREEN.getIndex());
         headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        headerStyle.setBorderBottom(BorderStyle.THICK);
 
         XSSFFont font = ((XSSFWorkbook) workbook).createFont();
         font.setFontName("Arial");
         font.setFontHeightInPoints((short) 16);
         font.setBold(true);
+        font.setColor(IndexedColors.WHITE.getIndex());
         headerStyle.setFont(font);
 
         Cell headerCell = header.createCell(0);
@@ -135,15 +139,18 @@ public class ExcelTest {
         headerCell.setCellValue("Filepath");
         headerCell.setCellStyle(headerStyle);
 
-        headerCell = header.createCell(3);
-        headerCell.setCellValue("Has been downloaded");
+        headerCell = header.createCell(2);
+        headerCell.setCellValue("Download status");
         headerCell.setCellStyle(headerStyle);
 
         CellStyle style = workbook.createCellStyle();
         style.setWrapText(true);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
 
         for(int i = 0; i<downloads.size(); i++){
-            Row row = sheet.createRow(i+2); //create row in row 2 and up
+            Row row = sheet.createRow(i+1); //create row in row 2 and up
 
             Cell cell = row.createCell(0);
             cell.setCellValue(downloads.get(i).getFileName());
