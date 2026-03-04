@@ -12,7 +12,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 
+@Service
 public class PdfDownloaderService {
+
+
     DownloadStatus downloadFile(String url, Path filePath) throws IOException {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet httpGet = new HttpGet(url);

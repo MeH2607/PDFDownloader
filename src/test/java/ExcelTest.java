@@ -28,12 +28,12 @@ public class ExcelTest {
     void readFirst5LinesOfFile(){
 
 
-        String fileLocation = "src/GRI_2017_2025.xlsx";
+        String filePath = "src/GRI_2017_2025.xlsx";
         FileInputStream file;
         Workbook workbook;
         List<ExcelRow> files = new ArrayList<>();
         try{
-         file = new FileInputStream(new File(fileLocation));
+         file = new FileInputStream(new File(filePath));
          workbook = new XSSFWorkbook(file);
 
          Sheet sheet = workbook.getSheetAt(0);
@@ -109,10 +109,10 @@ public class ExcelTest {
         DownloadStatus downloadStatus4 = new DownloadStatus("4 - failed to download", null, false);
         DownloadStatus downloadStatus5 = new DownloadStatus("5 - file", "Path/path/report", true);
 
-        ArrayList<DownloadStatus> downloads = new ArrayList<>(Arrays.asList(downloadStatus1,downloadStatus2,downloadStatus3,downloadStatus4,downloadStatus5));
+        ArrayList<DownloadStatus> downloadList = new ArrayList<>(Arrays.asList(downloadStatus1,downloadStatus2,downloadStatus3,downloadStatus4,downloadStatus5));
 
         Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("Persons");
+        Sheet sheet = workbook.createSheet("PDF Downloads");
         sheet.setColumnWidth(0, 6000);
         sheet.setColumnWidth(1, 4500);
         sheet.setColumnWidth(2, 6200);
@@ -149,19 +149,19 @@ public class ExcelTest {
         style.setBorderLeft(BorderStyle.THIN);
         style.setBorderRight(BorderStyle.THIN);
 
-        for(int i = 0; i<downloads.size(); i++){
+        for(int i = 0; i<downloadList.size(); i++){
             Row row = sheet.createRow(i+1); //create row in row 2 and up
 
             Cell cell = row.createCell(0);
-            cell.setCellValue(downloads.get(i).getFileName());
+            cell.setCellValue(downloadList.get(i).getFileName());
             cell.setCellStyle(style);
 
             cell = row.createCell(1);
-            cell.setCellValue(downloads.get(i).getFilePath());
+            cell.setCellValue(downloadList.get(i).getFilePath());
             cell.setCellStyle(style);
 
             cell = row.createCell(2);
-            cell.setCellValue(downloads.get(i).isDownloaded() ? "Download successful":"Download failed");
+            cell.setCellValue(downloadList.get(i).isDownloaded() ? "Download successful":"Download failed");
             cell.setCellStyle(style);
         }
 
