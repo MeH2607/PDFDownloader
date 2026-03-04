@@ -44,25 +44,54 @@ public class PdfDownloaderService {
                 .build();
     }
 
-    public DownloadStatus downloadFile(ExcelRow er) throws IOException {
-        String userHome = System.getProperty("user.home");
-        Path folderPath = Paths.get(userHome, "Downloads", "Reports");
-        Files.createDirectories(folderPath);
-
-        // Extract original filename from URL safely
-        String originalFileName = Paths.get(new URL(er.getFileLink()).getPath())
-                .getFileName().toString();
-        String decodedOriginal = URLDecoder.decode(originalFileName, StandardCharsets.UTF_8);
-
-        // Build new filename with ID prefix
-        String newFileName = er.getFileName() + " - " + decodedOriginal;
-        Path filePath = folderPath.resolve(newFileName);
-
+    public DownloadStatus downloadFile(ExcelRow er) {
 
         try {
-            HttpGet httpGet = new HttpGet(er.getFileLink());
 
-            // 🔥 Critical: Add browser-like headers
+            // 1️⃣ Validate link FIRST
+            String link = er.getFileLink();
+
+            if (link == null || link.isBlank()) {
+                return new DownloadStatus(
+                        er.getFileName() + " - missing URL",
+                        null,
+                        false
+                );
+            }
+
+            // 2️⃣ Validate URL format
+            URL url;
+            try {
+                url = new URL(link);
+            } catch (Exception e) {
+                return new DownloadStatus(
+                        er.getFileName() + " - invalid URL",
+                        null,
+                        false
+                );
+            }
+
+            // 3️⃣ Create folder
+            String userHome = System.getProperty("user.home");
+            Path folderPath = Paths.get(userHome, "Downloads", "Reports");
+            Files.createDirectories(folderPath);
+
+            // 4️⃣ Extract filename safely
+            String originalFileName = Paths.get(url.getPath())
+                    .getFileName()
+                    .toString();
+
+            String decodedOriginal =
+                    URLDecoder.decode(originalFileName, StandardCharsets.UTF_8);
+
+            String newFileName =
+                    er.getFileName() + " - " + decodedOriginal;
+
+            Path filePath = folderPath.resolve(newFileName);
+
+            // 5️⃣ HTTP request
+            HttpGet httpGet = new HttpGet(link);
+
             httpGet.setHeader("User-Agent",
                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
                             "AppleWebKit/537.36 (KHTML, like Gecko) " +
@@ -75,7 +104,7 @@ public class PdfDownloaderService {
 
                 if (response.getCode() != 200) {
                     return new DownloadStatus(
-                            filePath.getFileName().toString(),
+                            newFileName,
                             null,
                             false
                     );
@@ -91,7 +120,7 @@ public class PdfDownloaderService {
                 }
 
                 return new DownloadStatus(
-                        filePath.getFileName().toString(),
+                        newFileName,
                         filePath.toAbsolutePath().toString(),
                         true
                 );
@@ -100,7 +129,7 @@ public class PdfDownloaderService {
         } catch (Exception e) {
 
             return new DownloadStatus(
-                    filePath.getFileName().toString(),
+                    er.getFileName() + " - error",
                     null,
                     false
             );

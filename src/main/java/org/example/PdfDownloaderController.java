@@ -66,7 +66,7 @@ public class PdfDownloaderController {
 
     @PostMapping("/pdf/test-from-local-excel")
     public ResponseEntity<List<DownloadStatus>> testFromLocalExcel() throws Exception {
-        String excelPath = "src/GRI_2017_2025.xlsx";
+        String excelPath = "src/GRI_2017_2025_test.xlsx";
         return ResponseEntity.ok(downloadPdfs(excelPath));
     }
 

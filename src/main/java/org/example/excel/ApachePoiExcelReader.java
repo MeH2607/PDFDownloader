@@ -25,8 +25,6 @@ public class ApachePoiExcelReader implements ExcelReader {
             Sheet sheet = workbook.getSheetAt(0);
 
 
-            int rowCount = 0; //to be able to control how many rows I wanna test
-
             boolean isFirstRow = true;
 
             for (Row row : sheet) {
@@ -37,13 +35,15 @@ public class ApachePoiExcelReader implements ExcelReader {
                     isFirstRow = false;
                     continue;}
 
+                if(isRowEmpty(row)){
+                    break;
+                }
+
                 ExcelRow excelRow = new ExcelRow();
                 int coloumn = 0;
 
                 for(Cell cell : row){
-                    if(cell.getCellType() == CellType.BLANK){
-                        break;
-                    }
+
                     switch (coloumn){
                         case 0:
                             excelRow.setFileName((int)cell.getNumericCellValue());
@@ -64,7 +64,7 @@ public class ApachePoiExcelReader implements ExcelReader {
                     coloumn++;
                 }
                 files.add(excelRow);
-                rowCount++;
+
             }
 
         }
@@ -72,5 +72,28 @@ public class ApachePoiExcelReader implements ExcelReader {
             System.out.println(e.getMessage());
         }
         return files;
+    }
+
+    private boolean isRowEmpty(Row row) {
+
+        if (row == null) {
+            return true;
+        }
+
+        for (int cellNum = row.getFirstCellNum();
+             cellNum < row.getLastCellNum();
+             cellNum++) {
+
+            Cell cell = row.getCell(cellNum);
+
+            if (cell != null &&
+                    cell.getCellType() != CellType.BLANK &&
+                    !cell.toString().trim().isEmpty()) {
+
+                return false; // Found non-empty cell
+            }
+        }
+
+        return true; // All cells empty
     }
 }
