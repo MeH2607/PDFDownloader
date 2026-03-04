@@ -5,6 +5,7 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.example.entities.DownloadStatus;
 import org.example.entities.ExcelRow;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+@Component
 public class ApachePoiExcelWriter implements ExcelWriter {
     public void write(List<DownloadStatus> downloadList) {
         Workbook workbook = new XSSFWorkbook();

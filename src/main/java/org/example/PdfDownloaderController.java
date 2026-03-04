@@ -55,23 +55,20 @@ public class PdfDownloaderController {
 
             DownloadStatus downloadStatus;
 
-            try {
-                // Try the original link first
-                downloadStatus = pdfDownloaderService.downloadFile(er.getFileLink(), filePath);
+            // Try the original link first
+            downloadStatus = pdfDownloaderService.downloadFile(er.getFileLink(), filePath);
 
-                // If download failed, try the backup link
-                if (!downloadStatus.isDownloaded() && er.getBackupLink() != null) {
-                    downloadStatus = pdfDownloaderService.downloadFile(er.getBackupLink(), filePath);
-                }
-                if (!downloadStatus.isDownloaded()) {
-                    downloadStatus = new DownloadStatus(String.valueOf(er.getFileName() + " - failed to download"), null, false);
-                }
-
-                downloadStatusList.add(downloadStatus);
-            } catch (IOException e) {
-                // Handle exceptions (optional: log and fail test)
-                throw e;
+            // If download failed, try the backup link
+            if (!downloadStatus.isDownloaded() && er.getBackupLink() != null) {
+                downloadStatus = pdfDownloaderService.downloadFile(er.getBackupLink(), filePath);
             }
+            if (!downloadStatus.isDownloaded()) {
+                downloadStatus = new DownloadStatus(String.valueOf(er.getFileName() + " - failed to download"), null, false);
+            }
+
+            downloadStatusList.add(downloadStatus);
+
+            Thread.sleep(800);
         }
         return downloadStatusList;
     }
@@ -82,4 +79,14 @@ public class PdfDownloaderController {
         return ResponseEntity.ok(downloadPdfs(excelPath));
     }
 
+    /*@PostMapping(value = "/pdf/upload-excel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+public ResponseEntity<List<DownloadStatus>> uploadExcel(@RequestParam("file") MultipartFile file) throws Exception {
+    Path temp = Files.createTempFile("upload-", ".xlsx");
+    file.transferTo(temp.toFile());
+    try {
+        return ResponseEntity.ok(yourService.downloadPdfs(temp.toString()));
+    } finally {
+        Files.deleteIfExists(temp);
+    }
+}*/
 }

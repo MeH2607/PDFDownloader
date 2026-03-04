@@ -1,11 +1,9 @@
 package org.example.excel;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.example.entities.ExcelRow;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class ApachePoiExcelReader implements ExcelReader {
     public List<ExcelRow> read(String filePath) {
 
@@ -32,9 +31,7 @@ public class ApachePoiExcelReader implements ExcelReader {
 
             for (Row row : sheet) {
 
-                if(rowCount == 5){
-                    break;
-                }
+
 
                 if (isFirstRow) {
                     isFirstRow = false;
@@ -44,6 +41,9 @@ public class ApachePoiExcelReader implements ExcelReader {
                 int coloumn = 0;
 
                 for(Cell cell : row){
+                    if(cell.getCellType() == CellType.BLANK){
+                        break;
+                    }
                     switch (coloumn){
                         case 0:
                             excelRow.setFileName((int)cell.getNumericCellValue());
