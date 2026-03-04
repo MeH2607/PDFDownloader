@@ -36,31 +36,22 @@ public class PdfDownloaderController {
 
 
     public List<DownloadStatus> downloadPdfs(String excelInput) throws Exception {
-        String userHome = System.getProperty("user.home");
-        Path folderPath = Paths.get(userHome, "Downloads", "Reports");
-        Files.createDirectories(folderPath);
+
 
         List<DownloadStatus> downloadStatusList = new ArrayList<>();
         List<ExcelRow> rows = apachePoiExcelReader.read(excelInput);
 
         for (ExcelRow er : rows) {
-            // Extract original filename from URL safely
-            String originalFileName = Paths.get(new URL(er.getFileLink()).getPath())
-                    .getFileName().toString();
-            String decodedOriginal = URLDecoder.decode(originalFileName, StandardCharsets.UTF_8);
 
-            // Build new filename with ID prefix
-            String newFileName = er.getFileName() + " - " + decodedOriginal;
-            Path filePath = folderPath.resolve(newFileName);
 
             DownloadStatus downloadStatus;
 
             // Try the original link first
-            downloadStatus = pdfDownloaderService.downloadFile(er.getFileLink(), filePath);
+            downloadStatus = pdfDownloaderService.downloadFile(er);
 
             // If download failed, try the backup link
             if (!downloadStatus.isDownloaded() && er.getBackupLink() != null) {
-                downloadStatus = pdfDownloaderService.downloadFile(er.getBackupLink(), filePath);
+                downloadStatus = pdfDownloaderService.downloadFile(er);
             }
             if (!downloadStatus.isDownloaded()) {
                 downloadStatus = new DownloadStatus(String.valueOf(er.getFileName() + " - failed to download"), null, false);

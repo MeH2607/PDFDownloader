@@ -8,11 +8,18 @@ import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.util.Timeout;
 import org.example.entities.DownloadStatus;
+import org.example.entities.ExcelRow;
 import org.springframework.stereotype.Service;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Service
 public class PdfDownloaderService {
@@ -37,10 +44,23 @@ public class PdfDownloaderService {
                 .build();
     }
 
-    public DownloadStatus downloadFile(String url, Path filePath) {
+    public DownloadStatus downloadFile(ExcelRow er) throws IOException {
+        String userHome = System.getProperty("user.home");
+        Path folderPath = Paths.get(userHome, "Downloads", "Reports");
+        Files.createDirectories(folderPath);
+
+        // Extract original filename from URL safely
+        String originalFileName = Paths.get(new URL(er.getFileLink()).getPath())
+                .getFileName().toString();
+        String decodedOriginal = URLDecoder.decode(originalFileName, StandardCharsets.UTF_8);
+
+        // Build new filename with ID prefix
+        String newFileName = er.getFileName() + " - " + decodedOriginal;
+        Path filePath = folderPath.resolve(newFileName);
+
 
         try {
-            HttpGet httpGet = new HttpGet(url);
+            HttpGet httpGet = new HttpGet(er.getFileLink());
 
             // 🔥 Critical: Add browser-like headers
             httpGet.setHeader("User-Agent",
