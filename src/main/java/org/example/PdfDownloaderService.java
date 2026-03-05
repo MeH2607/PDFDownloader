@@ -1,5 +1,6 @@
 package org.example;
 
+import lombok.AllArgsConstructor;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -9,6 +10,7 @@ import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.util.Timeout;
 import org.example.entities.DownloadStatus;
 import org.example.entities.ExcelRow;
+import org.example.excel.ApachePoiExcelReader;
 import org.springframework.stereotype.Service;
 
 import java.io.FileOutputStream;
@@ -20,13 +22,18 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class PdfDownloaderService {
 
     private final CloseableHttpClient httpClient;
+    private final ApachePoiExcelReader apachePoiExcelReader;
 
-    public PdfDownloaderService() {
+
+    public PdfDownloaderService(ApachePoiExcelReader apachePoiExcelReader) {
+        this.apachePoiExcelReader = apachePoiExcelReader;
 
         PoolingHttpClientConnectionManager cm =
                 new PoolingHttpClientConnectionManager();
@@ -42,6 +49,37 @@ public class PdfDownloaderService {
                 .setConnectionManager(cm)
                 .setDefaultRequestConfig(requestConfig)
                 .build();
+    }
+
+
+
+    public List<DownloadStatus> downloadPdfs(String excelInput) throws Exception {
+
+
+        List<DownloadStatus> downloadStatusList = new ArrayList<>();
+        List<ExcelRow> rows = apachePoiExcelReader.read(excelInput);
+
+        for (ExcelRow er : rows) {
+
+
+            DownloadStatus downloadStatus;
+
+            // Try the original link first
+            downloadStatus =downloadFile(er);
+
+            // If download failed, try the backup link
+            if (!downloadStatus.isDownloaded() && er.getBackupLink() != null) {
+                downloadStatus = downloadFile(er);
+            }
+            if (!downloadStatus.isDownloaded()) {
+                downloadStatus = new DownloadStatus(String.valueOf(er.getFileName() + " - failed to download"), null, false);
+            }
+
+            downloadStatusList.add(downloadStatus);
+
+            Thread.sleep(800);
+        }
+        return downloadStatusList;
     }
 
     public DownloadStatus downloadFile(ExcelRow er) {

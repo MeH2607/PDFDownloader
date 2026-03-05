@@ -18,76 +18,76 @@ import java.util.*;
 
 public class ExcelTest {
 
-    ExcelRow er0 = new ExcelRow(1, "https://www.novonordisk.com/content/dam/nncorp/global/en/investors/irmaterial/annual_report/2025/novo-nordisk-annual-report-2024.pdfst","https://www.novonordisk.com/content/dam/nncorp/global/en/investors/irmaterial/annual_report/2025/novo-nordisk-annual-report-2024.pdf");
-    ExcelRow er1 = new ExcelRow(2, "https://danskebank.com/-/media/danske-bank-com/file-cloud/2025/2/danske-bank---annual-report-2024.pdf?rev=430be65be4cd43d18fc8adeec2139eb5",null);
+    ExcelRow er0 = new ExcelRow(1, "https://www.novonordisk.com/content/dam/nncorp/global/en/investors/irmaterial/annual_report/2025/novo-nordisk-annual-report-2024.pdfst", "https://www.novonordisk.com/content/dam/nncorp/global/en/investors/irmaterial/annual_report/2025/novo-nordisk-annual-report-2024.pdf");
+    ExcelRow er1 = new ExcelRow(2, "https://danskebank.com/-/media/danske-bank-com/file-cloud/2025/2/danske-bank---annual-report-2024.pdf?rev=430be65be4cd43d18fc8adeec2139eb5", null);
     ExcelRow er2 = new ExcelRow(3, "https://www.cbs.dk/files/cbs.dk/call_to_action/cbs-annual-report-2024.pdf", null);
-    ExcelRow er3 = new ExcelRow(4, "https://www.nordea.com/en/doc/annual-report-nordea-bank-abp-2024-0.pdf",null);
-    ExcelRow er4 = new ExcelRow(5, "https://www.eifo.dk/media/f23eicl4/eifo-annual-report-2026.pdf","https://www.eifo.dk/media/f23eicl4/eifo-annual-report-2024.pdf");
-    ArrayList<ExcelRow> expectedRows = new ArrayList<>(Arrays.asList(er0, er1, er2, er3,er4));
+    ExcelRow er3 = new ExcelRow(4, "https://www.nordea.com/en/doc/annual-report-nordea-bank-abp-2024-0.pdf", null);
+    ExcelRow er4 = new ExcelRow(5, "https://www.eifo.dk/media/f23eicl4/eifo-annual-report-2026.pdf", "https://www.eifo.dk/media/f23eicl4/eifo-annual-report-2024.pdf");
+    ArrayList<ExcelRow> expectedRows = new ArrayList<>(Arrays.asList(er0, er1, er2, er3, er4));
+
     @Test
-    void readFirst5LinesOfFile(){
+    void readFirst5LinesOfFile() {
 
 
         String filePath = "src/GRI_2017_2025.xlsx";
         FileInputStream file;
         Workbook workbook;
         List<ExcelRow> files = new ArrayList<>();
-        try{
-         file = new FileInputStream(new File(filePath));
-         workbook = new XSSFWorkbook(file);
+        try {
+            file = new FileInputStream(new File(filePath));
+            workbook = new XSSFWorkbook(file);
 
-         Sheet sheet = workbook.getSheetAt(0);
+            Sheet sheet = workbook.getSheetAt(0);
 
 
-        int rowCount = 0; //to be able to control how many rows I wanna test
+            int rowCount = 0; //to be able to control how many rows I wanna test
 
             boolean isFirstRow = true;
 
             for (Row row : sheet) {
 
-                if(rowCount == 5){
+                if (rowCount == 5) {
                     break;
                 }
 
                 if (isFirstRow) {
                     isFirstRow = false;
-                    continue;}
-
-             ExcelRow excelRow = new ExcelRow();
-             int coloumn = 0;
-
-            for(Cell cell : row){
-                switch (coloumn){
-                    case 0:
-                        excelRow.setFileName((int)cell.getNumericCellValue());
-                        break;
-                    case 1:
-                        excelRow.setFileLink(cell.getStringCellValue());
-                        break;
-                    case 2:
-                        if(cell.getStringCellValue().equals("")){
-                            excelRow.setBackupLink(null);
-                        }
-                        else{
-                        excelRow.setBackupLink(cell.getStringCellValue());
-                        }
-                        break;
+                    continue;
                 }
 
-                coloumn++;
-            }
-            files.add(excelRow);
-            rowCount++;
-         }
+                ExcelRow excelRow = new ExcelRow();
+                int coloumn = 0;
 
-        }
-        catch (IOException e){
+                for (Cell cell : row) {
+                    switch (coloumn) {
+                        case 0:
+                            excelRow.setFileName((int) cell.getNumericCellValue());
+                            break;
+                        case 1:
+                            excelRow.setFileLink(cell.getStringCellValue());
+                            break;
+                        case 2:
+                            if (cell.getStringCellValue().equals("")) {
+                                excelRow.setBackupLink(null);
+                            } else {
+                                excelRow.setBackupLink(cell.getStringCellValue());
+                            }
+                            break;
+                    }
+
+                    coloumn++;
+                }
+                files.add(excelRow);
+                rowCount++;
+            }
+
+        } catch (IOException e) {
             System.out.println(e.getMessage());
         }
 
         assertEquals(5, files.size());
 
-        for(int i = 0; i<expectedRows.size(); i++){
+        for (int i = 0; i < expectedRows.size(); i++) {
             ExcelRow expectedRow = expectedRows.get(i);
             ExcelRow actualRow = files.get(i);
 
@@ -99,8 +99,7 @@ public class ExcelTest {
     }
 
     @Test
-    void testWriteToExcelFile() throws IOException{
-
+    void testWriteToExcelFile() throws IOException {
 
 
         DownloadStatus downloadStatus1 = new DownloadStatus("1 - file", "Path/path/report", true);
@@ -109,7 +108,7 @@ public class ExcelTest {
         DownloadStatus downloadStatus4 = new DownloadStatus("4 - failed to download", null, false);
         DownloadStatus downloadStatus5 = new DownloadStatus("5 - file", "Path/path/report", true);
 
-        ArrayList<DownloadStatus> downloadList = new ArrayList<>(Arrays.asList(downloadStatus1,downloadStatus2,downloadStatus3,downloadStatus4,downloadStatus5));
+        ArrayList<DownloadStatus> downloadList = new ArrayList<>(Arrays.asList(downloadStatus1, downloadStatus2, downloadStatus3, downloadStatus4, downloadStatus5));
 
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("PDF Downloads");
@@ -149,8 +148,8 @@ public class ExcelTest {
         style.setBorderLeft(BorderStyle.THIN);
         style.setBorderRight(BorderStyle.THIN);
 
-        for(int i = 0; i<downloadList.size(); i++){
-            Row row = sheet.createRow(i+1); //create row in row 2 and up
+        for (int i = 0; i < downloadList.size(); i++) {
+            Row row = sheet.createRow(i + 1); //create row in row 2 and up
 
             Cell cell = row.createCell(0);
             cell.setCellValue(downloadList.get(i).getFileName());
@@ -161,7 +160,7 @@ public class ExcelTest {
             cell.setCellStyle(style);
 
             cell = row.createCell(2);
-            cell.setCellValue(downloadList.get(i).isDownloaded() ? "Download successful":"Download failed");
+            cell.setCellValue(downloadList.get(i).isDownloaded() ? "Download successful" : "Download failed");
             cell.setCellStyle(style);
         }
 

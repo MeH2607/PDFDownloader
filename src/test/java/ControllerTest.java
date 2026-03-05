@@ -168,8 +168,7 @@ public class ControllerTest {
                 downloadStatus = new DownloadStatus(String.valueOf(er.getFileName() + " - failed to download"), null, false);
             }
         } catch (IOException e) {
-            // Handle exceptions (optional: log and fail test)
-            throw e;
+            throw new RuntimeException(e);
         }
 
         // -------------------------------

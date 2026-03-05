@@ -36,58 +36,28 @@ import java.util.List;
 public class PdfDownloaderController {
 
     private final PdfDownloaderService pdfDownloaderService;
-    private final ApachePoiExcelReader apachePoiExcelReader;
 
-
-    public List<DownloadStatus> downloadPdfs(String excelInput) throws Exception {
-
-
-        List<DownloadStatus> downloadStatusList = new ArrayList<>();
-        List<ExcelRow> rows = apachePoiExcelReader.read(excelInput);
-
-        for (ExcelRow er : rows) {
-
-
-            DownloadStatus downloadStatus;
-
-            // Try the original link first
-            downloadStatus = pdfDownloaderService.downloadFile(er);
-
-            // If download failed, try the backup link
-            if (!downloadStatus.isDownloaded() && er.getBackupLink() != null) {
-                downloadStatus = pdfDownloaderService.downloadFile(er);
-            }
-            if (!downloadStatus.isDownloaded()) {
-                downloadStatus = new DownloadStatus(String.valueOf(er.getFileName() + " - failed to download"), null, false);
-            }
-
-            downloadStatusList.add(downloadStatus);
-
-            Thread.sleep(800);
-        }
-        return downloadStatusList;
-    }
 
 
     @PostMapping("/pdf/test-from-local-excel")
     public ResponseEntity<List<DownloadStatus>> testFromLocalExcel() throws Exception {
         String excelPath = "src/GRI_2017_2025_test.xlsx";
-        return ResponseEntity.ok(downloadPdfs(excelPath));
+        return ResponseEntity.ok(pdfDownloaderService.downloadPdfs(excelPath));
     }
 
     @PostMapping(value = "/pdf/upload-excel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-public ResponseEntity<List<DownloadStatus>> uploadExcel(@RequestParam("file") MultipartFile file) throws Exception {
-    Path temp = Files.createTempFile("upload-", ".xlsx");
-    file.transferTo(temp.toFile());
-    try {
-        return ResponseEntity.ok(downloadPdfs(temp.toString()));
-    } finally {
-        Files.deleteIfExists(temp);
+    public ResponseEntity<List<DownloadStatus>> uploadExcel(@RequestParam("file") MultipartFile file) throws Exception {
+        Path temp = Files.createTempFile("upload-", ".xlsx");
+        file.transferTo(temp.toFile());
+        try {
+            return ResponseEntity.ok(pdfDownloaderService.downloadPdfs(temp.toString()));
+        } finally {
+            Files.deleteIfExists(temp);
+        }
     }
-}
 
     @GetMapping("/pdf/getStatusList")
-    public ResponseEntity<List<DownloadStatus>> getAllDownloadStatuses(List<DownloadStatus> downloadStatusList){
+    public ResponseEntity<List<DownloadStatus>> getAllDownloadStatuses(List<DownloadStatus> downloadStatusList) {
 
         return ResponseEntity.ok(downloadStatusList);
     }
