@@ -46,7 +46,7 @@ public class PdfDownloaderController {
     }
 
     @PostMapping(value = "/pdf/upload-excel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<List<DownloadStatus>> uploadExcel(@RequestParam("file") MultipartFile file) throws Exception {
+    public ResponseEntity<List<DownloadStatus>> uploadExcel(@RequestParam("file") MultipartFile  file) throws Exception {
         Path temp = Files.createTempFile("upload-", ".xlsx");
         file.transferTo(temp.toFile());
         try {
