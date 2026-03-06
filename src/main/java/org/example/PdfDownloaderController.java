@@ -61,4 +61,9 @@ public class PdfDownloaderController {
 
         return ResponseEntity.ok(downloadStatusList);
     }
+
+    @GetMapping("/pdf/getStatusPath")
+    public ResponseEntity<String> getStatusPath(){
+
+    }
 }
