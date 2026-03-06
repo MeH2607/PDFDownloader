@@ -79,6 +79,8 @@ public class PdfDownloaderService {
 
             Thread.sleep(800);
         }
+
+
         return downloadStatusList;
     }
 
