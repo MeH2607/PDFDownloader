@@ -11,6 +11,8 @@ import org.apache.hc.core5.util.Timeout;
 import org.example.entities.DownloadStatus;
 import org.example.entities.ExcelRow;
 import org.example.excel.ApachePoiExcelReader;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.FileOutputStream;
@@ -30,10 +32,17 @@ public class PdfDownloaderService {
 
     private final CloseableHttpClient httpClient;
     private final ApachePoiExcelReader apachePoiExcelReader;
+    private final Path reportsFolder;
 
 
-    public PdfDownloaderService(ApachePoiExcelReader apachePoiExcelReader) {
+    public PdfDownloaderService(ApachePoiExcelReader apachePoiExcelReader) throws IOException {
         this.apachePoiExcelReader = apachePoiExcelReader;
+
+        String userHome = System.getProperty("user.home");
+        this.reportsFolder = Paths.get(userHome, "Downloads", "Reports");
+
+        Files.createDirectories(reportsFolder);
+
 
         PoolingHttpClientConnectionManager cm =
                 new PoolingHttpClientConnectionManager();
@@ -52,7 +61,7 @@ public class PdfDownloaderService {
     }
 
 
-
+    @CachePut(value = "pdfDownloads", key = "'latest'")
     public List<DownloadStatus> downloadPdfs(String excelInput) throws Exception {
 
 
@@ -70,7 +79,7 @@ public class PdfDownloaderService {
             // If download failed, try the backup link
             if (!downloadStatus.isDownloaded() && er.getBackupLink() != null) {
                 downloadStatus = downloadFile(er);
-            }
+            } //TODO fix backup link læser, flyt ansvaret til downloadFile()
             if (!downloadStatus.isDownloaded()) {
                 downloadStatus = new DownloadStatus(String.valueOf(er.getFileName() + " - failed to download"), null, false);
             }
@@ -112,9 +121,7 @@ public class PdfDownloaderService {
             }
 
             // 3️⃣ Create folder
-            String userHome = System.getProperty("user.home");
-            Path folderPath = Paths.get(userHome, "Downloads", "Reports");
-            Files.createDirectories(folderPath);
+            Path folderPath = reportsFolder;
 
             // 4️⃣ Extract filename safely
             String originalFileName = Paths.get(url.getPath())

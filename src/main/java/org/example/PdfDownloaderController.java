@@ -10,6 +10,9 @@ import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.example.entities.DownloadStatus;
 import org.example.entities.ExcelRow;
 import org.example.excel.ApachePoiExcelReader;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,7 +39,8 @@ import java.util.List;
 public class PdfDownloaderController {
 
     private final PdfDownloaderService pdfDownloaderService;
-
+    @Autowired
+    private CacheManager cacheManager;
 
 
     @PostMapping("/pdf/test-from-local-excel")
@@ -56,14 +60,23 @@ public class PdfDownloaderController {
         }
     }
 
-    @GetMapping("/pdf/getStatusList")
+    /*@GetMapping("/pdf/getStatusList")
     public ResponseEntity<List<DownloadStatus>> getAllDownloadStatuses(List<DownloadStatus> downloadStatusList) {
 
         return ResponseEntity.ok(downloadStatusList);
+    }*/
+    @GetMapping("/pdf/getCache")
+    public List<DownloadStatus> getLatestDownloads() {
+
+        Cache cache = cacheManager.getCache("pdfDownloads");
+
+        if (cache == null) {
+            return List.of();
+        }
+
+        List<DownloadStatus> result = cache.get("latest", List.class);
+
+        return result != null ? result : List.of();
     }
 
-    @GetMapping("/pdf/getStatusPath")
-    public ResponseEntity<String> getStatusPath(){
-
-    }
 }
