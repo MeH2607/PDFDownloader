@@ -73,19 +73,7 @@ public class PdfDownloaderService {
 
         for (ExcelRow er : rows) {
 
-
-            DownloadStatus downloadStatus;
-
-            // Try the original link first
-            downloadStatus = downloadFile(er);
-
-            // If download failed, try the backup link
-            if (!downloadStatus.isDownloaded() && er.getBackupLink() != null) {
-                downloadStatus = downloadFile(er);
-            } //TODO fix backup link læser, flyt ansvaret til downloadFile()
-            if (!downloadStatus.isDownloaded()) {
-                downloadStatus = new DownloadStatus(String.valueOf(er.getFileName() + " - failed to download"), null, false);
-            }
+            DownloadStatus downloadStatus = downloadFile(er);
 
             downloadStatusList.add(downloadStatus);
 
@@ -100,35 +88,40 @@ public class PdfDownloaderService {
 
     public DownloadStatus downloadFile(ExcelRow er) {
 
+        List<String> downloadLinks = new ArrayList<>();
+
+        downloadLinks.add(er.getFileLink());
+
+        if (er.getBackupLink() != null && !er.getBackupLink().isBlank()) {
+            downloadLinks.add(er.getBackupLink());
+        }
+
+        for (String link : downloadLinks) {
+
+            DownloadStatus status = attemptDownload(link, er);
+
+            if (status.isDownloaded()) {
+                return status;
+            }
+        }
+
+        return new DownloadStatus(
+                er.getFileName() + " - failed to download",
+                null,
+                false
+        );
+    }
+
+    private DownloadStatus attemptDownload(String link, ExcelRow er) {
+
         try {
 
-            // 1️⃣ Validate link FIRST
-            String link = er.getFileLink();
-
             if (link == null || link.isBlank()) {
-                return new DownloadStatus(
-                        er.getFileName() + " - missing URL",
-                        null,
-                        false
-                );
+                return new DownloadStatus(er.getFileName() + " - missing URL", null, false);
             }
 
-            // 2️⃣ Validate URL format
-            URL url;
-            try {
-                url = new URL(link);
-            } catch (Exception e) {
-                return new DownloadStatus(
-                        er.getFileName() + " - invalid URL",
-                        null,
-                        false
-                );
-            }
+            URL url = new URL(link);
 
-            // 3️⃣ Create folder
-            Path folderPath = reportsFolder;
-
-            // 4️⃣ Extract filename safely
             String originalFileName = Paths.get(url.getPath())
                     .getFileName()
                     .toString();
@@ -139,15 +132,12 @@ public class PdfDownloaderService {
             String newFileName =
                     er.getFileName() + " - " + decodedOriginal;
 
-            Path filePath = folderPath.resolve(newFileName);
+            Path filePath = reportsFolder.resolve(newFileName);
 
-            // 5️⃣ HTTP request
             HttpGet httpGet = new HttpGet(link);
 
             httpGet.setHeader("User-Agent",
-                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
-                            "AppleWebKit/537.36 (KHTML, like Gecko) " +
-                            "Chrome/120.0.0.0 Safari/537.36");
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
 
             httpGet.setHeader("Accept",
                     "application/pdf,application/octet-stream;q=0.9,*/*;q=0.8");
@@ -155,11 +145,7 @@ public class PdfDownloaderService {
             return httpClient.execute(httpGet, response -> {
 
                 if (response.getCode() != 200) {
-                    return new DownloadStatus(
-                            newFileName,
-                            null,
-                            false
-                    );
+                    return new DownloadStatus(newFileName, null, false);
                 }
 
                 HttpEntity entity = response.getEntity();
@@ -179,12 +165,11 @@ public class PdfDownloaderService {
             });
 
         } catch (Exception e) {
-
-            return new DownloadStatus(
-                    er.getFileName() + " - error",
-                    null,
-                    false
-            );
+            return new DownloadStatus(er.getFileName() + " - error", null, false);
         }
     }
+
+
+
 }
+
