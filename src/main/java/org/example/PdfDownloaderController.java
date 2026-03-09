@@ -21,13 +21,12 @@ import java.util.List;
 public class PdfDownloaderController {
 
     private final PdfDownloaderService pdfDownloaderService;
-    @Autowired
-    private CacheManager cacheManager;
+
 
 
     @PostMapping("/pdf/test-from-local-excel")
     public ResponseEntity<List<DownloadStatus>> testFromLocalExcel() throws Exception {
-        String excelPath = "src/GRI_2017_2025_test.xlsx";
+        String excelPath = "src/GRI_2017_2025_test - 50 entries.xlsx";
         return ResponseEntity.ok(pdfDownloaderService.downloadPdfsFromExcelFile(excelPath));
     }
 

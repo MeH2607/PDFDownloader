@@ -24,6 +24,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 @Service
 public class PdfDownloaderService {
@@ -32,6 +35,7 @@ public class PdfDownloaderService {
     private final ApachePoiExcelReader apachePoiExcelReader;
     private final Path reportsFolder;
     private final ApachePoiExcelWriter apachePoiExcelWriter;
+    private final ExecutorService executor = Executors.newFixedThreadPool(10); //For async download
 
 
 
@@ -68,14 +72,19 @@ public class PdfDownloaderService {
         List<DownloadStatus> downloadStatusList = new ArrayList<>();
         List<ExcelRow> rows = apachePoiExcelReader.read(excelInput);
 
+
+
+        //Parallel download
+        List<Future<DownloadStatus>> futures = new ArrayList<>();
+
         for (ExcelRow er : rows) {
-
-            DownloadStatus downloadStatus = downloadFile(er);
-
-            downloadStatusList.add(downloadStatus);
-
-            Thread.sleep(800);
+            futures.add(executor.submit(() -> downloadFile(er)));
         }
+
+        for (Future<DownloadStatus> future : futures) {
+            downloadStatusList.add(future.get());
+        }
+
 
         //Adds the Report folder as parameter
         apachePoiExcelWriter.write(downloadStatusList, reportsFolder.getParent().toString());
