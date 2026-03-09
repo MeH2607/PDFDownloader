@@ -1,6 +1,5 @@
 package org.example;
 
-import lombok.AllArgsConstructor;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -12,8 +11,6 @@ import org.example.entities.DownloadStatus;
 import org.example.entities.ExcelRow;
 import org.example.excel.ApachePoiExcelReader;
 import org.example.excel.ApachePoiExcelWriter;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.FileOutputStream;
@@ -65,7 +62,7 @@ public class PdfDownloaderService {
     }
 
 
-    public List<DownloadStatus> downloadPdfs(String excelInput) throws Exception {
+    public List<DownloadStatus> downloadPdfsFromExcelFile(String excelInput) throws Exception {
 
 
         List<DownloadStatus> downloadStatusList = new ArrayList<>();
