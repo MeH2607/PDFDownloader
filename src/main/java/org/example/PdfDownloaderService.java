@@ -19,14 +19,18 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import static org.apache.commons.io.file.PathUtils.deleteDirectory;
 
 @Service
 public class PdfDownloaderService {
@@ -175,7 +179,18 @@ public class PdfDownloaderService {
         }
     }
 
-
+    //TODO fix parent folder and report file not deleting. Add to frontend
+    public void deleteFile() throws IOException{
+        Files.walk(reportsFolder)
+                .sorted(Comparator.reverseOrder())
+                .forEach(path -> {
+                    try {
+                        Files.delete(path);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+    }
 
 }
 
