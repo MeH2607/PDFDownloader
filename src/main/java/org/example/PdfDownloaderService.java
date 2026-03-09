@@ -34,7 +34,7 @@ public class PdfDownloaderService {
     private final ApachePoiExcelReader apachePoiExcelReader;
     private final Path reportsFolder;
     //TODO Add excelwriter
-    //TODO Remove caching logic
+ 
 
     public PdfDownloaderService(ApachePoiExcelReader apachePoiExcelReader) throws IOException {
         this.apachePoiExcelReader = apachePoiExcelReader;
@@ -62,7 +62,6 @@ public class PdfDownloaderService {
     }
 
 
-    @CachePut(value = "pdfDownloads", key = "'latest'")
     public List<DownloadStatus> downloadPdfs(String excelInput) throws Exception {
 
 
