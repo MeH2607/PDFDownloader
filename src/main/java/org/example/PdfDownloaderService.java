@@ -33,7 +33,8 @@ public class PdfDownloaderService {
     private final CloseableHttpClient httpClient;
     private final ApachePoiExcelReader apachePoiExcelReader;
     private final Path reportsFolder;
-
+    //TODO Add excelwriter
+    //TODO Remove caching logic
 
     public PdfDownloaderService(ApachePoiExcelReader apachePoiExcelReader) throws IOException {
         this.apachePoiExcelReader = apachePoiExcelReader;
@@ -74,7 +75,7 @@ public class PdfDownloaderService {
             DownloadStatus downloadStatus;
 
             // Try the original link first
-            downloadStatus =downloadFile(er);
+            downloadStatus = downloadFile(er);
 
             // If download failed, try the backup link
             if (!downloadStatus.isDownloaded() && er.getBackupLink() != null) {

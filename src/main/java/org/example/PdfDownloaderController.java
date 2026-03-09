@@ -60,23 +60,6 @@ public class PdfDownloaderController {
         }
     }
 
-    /*@GetMapping("/pdf/getStatusList")
-    public ResponseEntity<List<DownloadStatus>> getAllDownloadStatuses(List<DownloadStatus> downloadStatusList) {
 
-        return ResponseEntity.ok(downloadStatusList);
-    }*/
-    @GetMapping("/pdf/getCache")
-    public List<DownloadStatus> getLatestDownloads() {
-
-        Cache cache = cacheManager.getCache("pdfDownloads");
-
-        if (cache == null) {
-            return List.of();
-        }
-
-        List<DownloadStatus> result = cache.get("latest", List.class);
-
-        return result != null ? result : List.of();
-    }
 
 }
