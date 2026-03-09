@@ -11,6 +11,7 @@ import org.apache.hc.core5.util.Timeout;
 import org.example.entities.DownloadStatus;
 import org.example.entities.ExcelRow;
 import org.example.excel.ApachePoiExcelReader;
+import org.example.excel.ApachePoiExcelWriter;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -33,14 +34,15 @@ public class PdfDownloaderService {
     private final CloseableHttpClient httpClient;
     private final ApachePoiExcelReader apachePoiExcelReader;
     private final Path reportsFolder;
-    //TODO Add excelwriter
- 
+    private final ApachePoiExcelWriter apachePoiExcelWriter;
 
-    public PdfDownloaderService(ApachePoiExcelReader apachePoiExcelReader) throws IOException {
+
+
+    public PdfDownloaderService(ApachePoiExcelReader apachePoiExcelReader, ApachePoiExcelWriter apachePoiExcelWriter) throws IOException {
         this.apachePoiExcelReader = apachePoiExcelReader;
 
         String userHome = System.getProperty("user.home");
-        this.reportsFolder = Paths.get(userHome, "Downloads", "Reports");
+        this.reportsFolder = Paths.get(userHome, "Downloads", "Reports", "downloaded_files");
 
         Files.createDirectories(reportsFolder);
 
@@ -59,6 +61,7 @@ public class PdfDownloaderService {
                 .setConnectionManager(cm)
                 .setDefaultRequestConfig(requestConfig)
                 .build();
+        this.apachePoiExcelWriter = apachePoiExcelWriter;
     }
 
 
@@ -89,6 +92,8 @@ public class PdfDownloaderService {
             Thread.sleep(800);
         }
 
+        //Adds the Report folder as parameter
+        apachePoiExcelWriter.write(downloadStatusList, reportsFolder.getParent().toString());
 
         return downloadStatusList;
     }

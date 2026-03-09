@@ -17,7 +17,7 @@ import java.util.List;
 
 @Component
 public class ApachePoiExcelWriter implements ExcelWriter {
-    public void write(List<DownloadStatus> downloadList) {
+    public void write(List<DownloadStatus> downloadList, String downloadFilePath) {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("PDF Downloads");
         sheet.setColumnWidth(0, 6000);
@@ -72,9 +72,9 @@ public class ApachePoiExcelWriter implements ExcelWriter {
             cell.setCellStyle(style);
         }
 
-        File currDir = new File(".");
-        String path = currDir.getAbsolutePath();
-        String fileLocation = path.substring(0, path.length() - 1) + "writeTest.xlsx";
+
+
+        String fileLocation = Paths.get(downloadFilePath, "Download_Report.xlsx").toString();
 
 
         try{
