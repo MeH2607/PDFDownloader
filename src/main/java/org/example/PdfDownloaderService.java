@@ -45,6 +45,7 @@ public class PdfDownloaderService {
     private final CloseableHttpClient httpClient;
     /**
      * the filepath where the pdf's and the report file will be saved
+     * Will always be saved under user/username/downloads/Reports
      */
     private final Path reportsFolder;
     private final ApachePoiExcelReader apachePoiExcelReader;
@@ -83,6 +84,9 @@ public class PdfDownloaderService {
     /**
      * Reads every row of the the provided excel sheet and calls the downloadFiles method to download and save the files.
      * The method is able to handle the rows parallel thanks to the ExecutorService api
+     * also handles writing and saving the result of all downloads to an excel file
+     * @param excelInput the excelFile recieved from the frontend
+     * @return a list of the status of all the downloads
      */
     public List<DownloadStatus> downloadPdfsFromExcelFile(String excelInput) throws Exception {
 
@@ -123,8 +127,10 @@ public class PdfDownloaderService {
     }
 
     /**
-     * Recieves every excel row and handles download success and failures
+
      * Calls the AttempDownload method for every row, and will try again with the backup link on failure if applicable
+     * @Param er: every excel row and handles download success and failures
+     * @return the download status recieved from @attemptDownload()
      */
     public DownloadStatus downloadFile(ExcelRow er) {
 
@@ -154,6 +160,9 @@ public class PdfDownloaderService {
 
     /**
      * Handles the actual download of the pdfs.
+     * @param link the url attempted to be downloaded
+     * @param er the whole row object
+     * @return the download status of the attempted pdf download
      */
     private DownloadStatus attemptDownload(String link, ExcelRow er) {
 
