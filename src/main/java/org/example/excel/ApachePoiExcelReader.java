@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+/**
+ * The api used for reading the excel files
+ */
 public class ApachePoiExcelReader implements ExcelReader {
     public List<ExcelRow> read(String filePath) {
 

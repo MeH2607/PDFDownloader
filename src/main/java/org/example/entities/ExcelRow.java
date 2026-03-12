@@ -10,6 +10,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+/**
+ * Represents the individual row in the excel sheet. Includes the original filename, the primary file link and the backup link.
+ */
 public class ExcelRow {
 
     int fileName;

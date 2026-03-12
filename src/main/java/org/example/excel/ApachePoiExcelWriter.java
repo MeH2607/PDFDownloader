@@ -16,6 +16,9 @@ import java.nio.file.Paths;
 import java.util.List;
 
 @Component
+/**
+ * The api used for writing to excel files
+ */
 public class ApachePoiExcelWriter implements ExcelWriter {
     public void write(List<DownloadStatus> downloadList, String downloadFilePath) {
         Workbook workbook = new XSSFWorkbook();
