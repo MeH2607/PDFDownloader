@@ -29,17 +29,27 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import static org.apache.commons.io.file.PathUtils.deleteDirectory;
 
 @Service
+/**
+ * Serviceclass for the application where logic is being handled
+ */
 public class PdfDownloaderService {
 
+    /**
+     *  handles the http calls
+     */
     private final CloseableHttpClient httpClient;
-    private final ApachePoiExcelReader apachePoiExcelReader;
+    /**
+     * the filepath where the pdf's and the report file will be saved
+     */
     private final Path reportsFolder;
+    private final ApachePoiExcelReader apachePoiExcelReader;
     private final ApachePoiExcelWriter apachePoiExcelWriter;
-    private final ExecutorService executor = Executors.newFixedThreadPool(10); //For async download
+
 
 
 
@@ -70,6 +80,10 @@ public class PdfDownloaderService {
     }
 
 
+    /**
+     * Reads every row of the the provided excel sheet and calls the downloadFiles method to download and save the files.
+     * The method is able to handle the rows parallel thanks to the ExecutorService api
+     */
     public List<DownloadStatus> downloadPdfsFromExcelFile(String excelInput) throws Exception {
 
 
@@ -77,25 +91,41 @@ public class PdfDownloaderService {
         List<ExcelRow> rows = apachePoiExcelReader.read(excelInput);
 
 
-
         //Parallel download
         List<Future<DownloadStatus>> futures = new ArrayList<>();
 
-        for (ExcelRow er : rows) {
-            futures.add(executor.submit(() -> downloadFile(er)));
+        /**
+         * The API that lets us handle pdf downloads parallel.
+         */
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+
+        try {
+            for (ExcelRow er : rows) {
+                futures.add(executor.submit(() -> downloadFile(er)));
+            }
+
+            for (Future<DownloadStatus> future : futures) {
+                downloadStatusList.add(future.get());
+            }
+
+        } finally {
+            executor.shutdown();
+            executor.awaitTermination(5, TimeUnit.MINUTES);
         }
 
-        for (Future<DownloadStatus> future : futures) {
-            downloadStatusList.add(future.get());
-        }
 
-
-        //Adds the Report folder as parameter
+        /**
+         *Adds the parent Report folder as parameter
+         */
         apachePoiExcelWriter.write(downloadStatusList, reportsFolder.getParent().toString());
 
         return downloadStatusList;
     }
 
+    /**
+     * Recieves every excel row and handles download success and failures
+     * Calls the AttempDownload method for every row, and will try again with the backup link on failure if applicable
+     */
     public DownloadStatus downloadFile(ExcelRow er) {
 
         List<String> downloadLinks = new ArrayList<>();
@@ -122,6 +152,9 @@ public class PdfDownloaderService {
         );
     }
 
+    /**
+     * Handles the actual download of the pdfs.
+     */
     private DownloadStatus attemptDownload(String link, ExcelRow er) {
 
         try {
@@ -179,18 +212,36 @@ public class PdfDownloaderService {
         }
     }
 
-    //TODO fix parent folder and report file not deleting. Add to frontend
+    //TODO fix parent folder and report file not deleting.
+    /**
+     * Deletes the files and folders that has been made.
+     * Currently buggy. Deletes the subfolder but can't delete the parent folder and it's files
+     */
     public void deleteFile() throws IOException{
-        Files.walk(reportsFolder)
-                .sorted(Comparator.reverseOrder())
-                .forEach(path -> {
-                    try {
-                        Files.delete(path);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+        if (Files.exists(reportsFolder)) {
+            Files.walk(reportsFolder)
+                    .sorted(Comparator.reverseOrder())
+                    .forEach(path -> {
+                        try {
+                            Files.delete(path);
+                        } catch (IOException e) {
+                            System.err.println("Kunne ikke slette: " + path + " - " + e.getMessage());
+                        }
+                    });
+        }
+        if (Files.exists(reportsFolder.getParent())) {
+            Files.walk(reportsFolder.getParent())
+                    .sorted(Comparator.reverseOrder())
+                    .forEach(path -> {
+                        try {
+                            Files.delete(path);
+                        } catch (IOException e) {
+                            System.err.println("Kunne ikke slette: " + path + " - " + e.getMessage());
+                        }
+                    });
+        }
     }
 
 }
+
 

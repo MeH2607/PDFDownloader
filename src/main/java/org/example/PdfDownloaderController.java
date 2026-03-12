@@ -25,11 +25,11 @@ public class PdfDownloaderController {
 
     @PostMapping("test-from-local-excel")
     public ResponseEntity<List<DownloadStatus>> testFromLocalExcel() throws Exception {
-        String excelPath = "src/GRI_2017_2025_test - 50 entries.xlsx";
+        String excelPath = "src/GRI_2017_2025_test - 10 entries.xlsx";
         return ResponseEntity.ok(pdfDownloaderService.downloadPdfsFromExcelFile(excelPath));
     }
 
-    @PostMapping(value = "pdf/upload-excel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "upload-excel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<List<DownloadStatus>> uploadExcel(@RequestParam("file") MultipartFile  file) throws Exception {
         Path temp = Files.createTempFile("upload-", ".xlsx");
         file.transferTo(temp.toFile());
