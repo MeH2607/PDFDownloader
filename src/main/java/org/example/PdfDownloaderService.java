@@ -129,7 +129,7 @@ public class PdfDownloaderService {
     /**
 
      * Calls the AttempDownload method for every row, and will try again with the backup link on failure if applicable
-     * @Param er: every excel row and handles download success and failures
+     * @param er every excel row and handles download success and failures
      * @return the download status recieved from @attemptDownload()
      */
     public DownloadStatus downloadFile(ExcelRow er) {
