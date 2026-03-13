@@ -15,4 +15,24 @@ This app requires you to upload an Excel file with with a list of pdf links. The
 ## Upload file
 When you open the app, you will be greeted by this screen.
 
-![Base screen](readMePics/Base-screen.png)
+<img src="readMePics/Base-screen.png" width="500">
+
+Press the "choose file" button and choose your excel file
+
+<img src="readMePics/File-selected.png" width="500">
+
+Once uploaded, press the "upload excel file" and you will see a progress circle while it is downloading the files.
+
+<img src="readMePics/loading.png" width="500">
+
+## After upload
+
+Once finished, you will see this screen
+
+<img src="readMePics/Loading-success" width="500">
+
+Here you will see the list of files that has been downloaded and wether they were successfully downloaded or not
+
+Furthormore the files will be downloaded locally on your pc in your Download folder, as presented on the app page.
+
+A folder called *Reports* will be created with a *Download_Report* excel file with the list of downloads statuses, and a subfolder called *Files* with the downloaded files.
