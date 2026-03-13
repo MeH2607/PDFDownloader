@@ -1,3 +1,4 @@
+## Link til frontend: https://github.com/MeH2607/PDF-Downloader-frontend
 # Welcome to the PDF downloader
 
 This app will help you download large amounts of PDF files online, and give you an overview of the downloaded files and the files that failed to download
