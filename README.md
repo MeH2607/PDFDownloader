@@ -14,4 +14,5 @@ This app requires you to upload an Excel file with with a list of pdf links. The
 
 ## Upload file
 When you open the app, you will be greeted by this screen.
-()
+
+![Base screen](readMePics/Base-screen.png)
