@@ -77,15 +77,19 @@ public class ApachePoiExcelWriter implements ExcelWriter {
 
 
 
-        String fileLocation = Paths.get(downloadFilePath, "Download_Report.xlsx").toString();
+        String fileLocation = Paths.get(downloadFilePath, "000 - Download_Report.xlsx").toString();
 
 
-        try{
-        FileOutputStream outputStream = new FileOutputStream(fileLocation);
-        workbook.write(outputStream);
-        workbook.close();
+        try (FileOutputStream outputStream = new FileOutputStream(fileLocation)) {
+            workbook.write(outputStream);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            try {
+                workbook.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
     }

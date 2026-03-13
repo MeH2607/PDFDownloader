@@ -58,7 +58,7 @@ public class PdfDownloaderService {
         this.apachePoiExcelReader = apachePoiExcelReader;
 
         String userHome = System.getProperty("user.home");
-        this.reportsFolder = Paths.get(userHome, "Downloads", "Reports", "downloaded_files");
+        this.reportsFolder = Paths.get(userHome, "Downloads", "Reports");
 
         Files.createDirectories(reportsFolder);
 
@@ -121,7 +121,7 @@ public class PdfDownloaderService {
         /**
          *Adds the parent Report folder as parameter
          */
-        apachePoiExcelWriter.write(downloadStatusList, reportsFolder.getParent().toString());
+        apachePoiExcelWriter.write(downloadStatusList, reportsFolder.toString());
 
         return downloadStatusList;
     }
@@ -238,17 +238,7 @@ public class PdfDownloaderService {
                         }
                     });
         }
-        if (Files.exists(reportsFolder.getParent())) {
-            Files.walk(reportsFolder.getParent())
-                    .sorted(Comparator.reverseOrder())
-                    .forEach(path -> {
-                        try {
-                            Files.delete(path);
-                        } catch (IOException e) {
-                            System.err.println("Kunne ikke slette: " + path + " - " + e.getMessage());
-                        }
-                    });
-        }
+
     }
 
 }
