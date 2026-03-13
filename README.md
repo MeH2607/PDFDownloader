@@ -2,6 +2,12 @@
 
 This app will help you download large amounts of PDF files online, and give you an overview of the downloaded files and the files that failed to download
 
+### Prerequisite; Start the application
+As of now, the app is not being hosted online and requires to be run locally.
+
+The app consists of this backend app, and a frontend app found in [this repository](https://github.com/MeH2607/PDF-Downloader-frontend).
+
+Both must be run and the app will be accessed on a live server for the frontend.
 
 ### Prerequisite; excel formatting
 This app requires you to upload an Excel file with with a list of pdf links. The file should be formated like
