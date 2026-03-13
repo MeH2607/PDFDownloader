@@ -29,7 +29,7 @@ Once uploaded, press the "upload excel file" and you will see a progress circle 
 
 Once finished, you will see this screen
 
-<img src="readMePics/Loading-success" width="500">
+<img src="readMePics/Loading-success.png" width="500">
 
 Here you will see the list of files that has been downloaded and wether they were successfully downloaded or not
 
